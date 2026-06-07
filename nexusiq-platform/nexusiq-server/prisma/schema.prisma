@@ -1,0 +1,243 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String?
+  role         Role     @default(STUDENT)
+  avatarUrl    String?
+  institution  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile      Profile?
+  attempts     Attempt[]
+  achievements UserAchievement[]
+  streak       Streak?
+  classrooms   ClassroomStudent[]
+  ownedClassrooms Classroom[]
+
+  @@index([email])
+}
+
+model Profile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  xp              Int      @default(0)
+  level           Int      @default(1)
+  bio             String?
+  goals           String[]
+  subjects        String[]
+  targetExam      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Streak {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  current      Int      @default(0)
+  longest      Int      @default(0)
+  lastActiveAt DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Quiz {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  subject     String
+  topic       String?
+  difficulty  Difficulty @default(MEDIUM)
+  duration    Int        @default(1800)
+  isPublic    Boolean    @default(true)
+  isAIGen     Boolean    @default(false)
+  creatorId   String?
+  classroomId String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  questions   Question[]
+  attempts    Attempt[]
+  classroom   Classroom? @relation(fields: [classroomId], references: [id])
+}
+
+model Question {
+  id             String       @id @default(cuid())
+  quizId         String
+  type           QuestionType @default(MCQ)
+  content        String
+  options        Json?
+  correctAnswer  Json
+  explanation    String?
+  subject        String?
+  topic          String?
+  difficulty     Difficulty   @default(MEDIUM)
+  points         Int          @default(4)
+  negativePoints Int          @default(1)
+  order          Int          @default(0)
+  imageUrl       String?
+  createdAt      DateTime     @default(now())
+
+  quiz           Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers        Answer[]
+
+  @@index([quizId])
+}
+
+model Attempt {
+  id            String    @id @default(cuid())
+  userId        String
+  quizId        String
+  score         Int       @default(0)
+  maxScore      Int       @default(0)
+  accuracy      Float     @default(0)
+  timeTaken     Int       @default(0)
+  status        AttemptStatus @default(IN_PROGRESS)
+  violations    Int       @default(0)
+  invalidated   Boolean   @default(false)
+  behaviorData  Json?
+  startedAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz          Quiz      @relation(fields: [quizId], references: [id])
+  answers       Answer[]
+  proctorLogs   ProctorLog[]
+
+  @@index([userId])
+  @@index([quizId])
+}
+
+model Answer {
+  id           String   @id @default(cuid())
+  attemptId    String
+  questionId   String
+  userAnswer   Json?
+  isCorrect    Boolean  @default(false)
+  timeSpent    Int      @default(0)
+  confidence   Float?
+  createdAt    DateTime @default(now())
+
+  attempt      Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question     Question @relation(fields: [questionId], references: [id])
+
+  @@index([attemptId])
+}
+
+model ProctorLog {
+  id            String   @id @default(cuid())
+  attemptId     String
+  violationType String
+  details       Json?
+  timestamp     DateTime @default(now())
+
+  attempt       Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  title       String
+  description String
+  iconUrl     String?
+  xpReward    Int      @default(50)
+  rarity      String   @default("common")
+
+  userAchievements UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+
+  @@unique([userId, achievementId])
+}
+
+model Classroom {
+  id          String   @id @default(cuid())
+  name        String
+  inviteCode  String   @unique
+  teacherId   String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  teacher     User              @relation(fields: [teacherId], references: [id])
+  students    ClassroomStudent[]
+  quizzes     Quiz[]
+}
+
+model ClassroomStudent {
+  id          String   @id @default(cuid())
+  classroomId String
+  userId      String
+  joinedAt    DateTime @default(now())
+
+  classroom   Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([classroomId, userId])
+}
+
+model CodeSandbox {
+  id              String   @id @default(cuid())
+  userId          String
+  code            String
+  language        String   @default("javascript")
+  passes          Boolean  @default(false)
+  efficiencyScore Int      @default(0)
+  feedback        String?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+  RECRUITER
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
+enum QuestionType {
+  MCQ
+  MSQ
+  TRUE_FALSE
+  FILL_BLANK
+  CODING
+  SUBJECTIVE
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+  INVALIDATED
+}

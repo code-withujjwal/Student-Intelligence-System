@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3307/quiz_platform
+    username: root
+    password: Ujjwal_SQL_0103
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000
+
+server:
+  # P0-5 FIX: Was port 8080 — mismatched with frontend VITE_API_URL=http://localhost:8082/api
+  # and with application.yml (port: 8082). Standardized to 8082 across all profiles.
+  port: 8082
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:mock_key_for_dev}
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    com.quizapp: DEBUG

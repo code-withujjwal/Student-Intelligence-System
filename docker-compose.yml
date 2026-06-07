@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: quiz_mysql
+    environment:
+      MYSQL_DATABASE: quiz_platform
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - quiz_network
+
+  redis:
+    image: redis:alpine
+    container_name: quiz_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - quiz_network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: quiz_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+      - "61613:61613" # STOMP plugin port
+    networks:
+      - quiz_network
+
+  backend:
+    build:
+      context: ./quiz-engine-backend
+      dockerfile: Dockerfile
+    container_name: quiz_backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/quiz_platform
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_REDIS_HOST=redis
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    networks:
+      - quiz_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - quiz_network
+
+networks:
+  quiz_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

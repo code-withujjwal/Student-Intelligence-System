@@ -1,0 +1,20 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# React
+node_modules
+dist
+.vite
+
+# Spring Boot
+target
+*.class
+
+# IDE
+.idea
+.vscode
+
+# Logs
+*.log
