@@ -11,6 +11,6 @@ RUN mvn clean package -DskipTests
 # Runtime Stage
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY --from=builder /app/target/quiz-engine-1.0.0-SNAPSHOT.jar app.jar
+COPY --from=builder /app/target/app.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=${SPRING_PROFILES_ACTIVE:prod}"]
