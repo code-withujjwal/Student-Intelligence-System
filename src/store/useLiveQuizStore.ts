@@ -29,7 +29,8 @@ export const useLiveQuizStore = create<LiveQuizState>((set, get) => ({
   connectWebSocket: (sessionId: string, username: string) => {
     const token = localStorage.getItem('jwt_token');
     
-    const socket = new SockJS('http://localhost:8080/ws/quiz');
+    const wsBaseUrl = import.meta.env.VITE_WS_URL || 'http://localhost:8082/ws';
+    const socket = new SockJS(`${wsBaseUrl}/quiz`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       connectHeaders: {
