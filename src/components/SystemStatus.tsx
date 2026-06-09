@@ -7,7 +7,7 @@ export default function SystemStatus() {
 
   useEffect(() => {
     // Ping backend health endpoint directly to avoid global axios error interceptors
-    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
+    const apiBase = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8082/api' : 'https://student-intelligence-system.onrender.com/api');
     const actuatorUrl = apiBase.replace(/\/api\/?$/, '/actuator/health');
 
     const checkHealth = async () => {
