@@ -10,7 +10,8 @@ spring:
       max-lifetime: 1800000
   jpa:
     hibernate:
-      ddl-auto: validate # NEVER update in production
+      # Changed to update to automatically create the numerous missing tables (achievements, audit_logs, etc) in production
+      ddl-auto: update
     show-sql: false
 
   rabbitmq:

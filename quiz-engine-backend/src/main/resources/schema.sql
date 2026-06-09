@@ -115,3 +115,14 @@ CREATE TABLE attempt_answers (
     FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
     INDEX idx_answer_attempt (attempt_id)
 );
+
+-- 9. Achievements
+CREATE TABLE achievements (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    badge_name VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_achievement_user (user_id)
+);

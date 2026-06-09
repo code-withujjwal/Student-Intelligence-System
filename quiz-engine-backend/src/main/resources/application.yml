@@ -8,6 +8,7 @@ spring:
     password: QuNmcpNQFUEtYDjiliUnyaHKQctEswsS
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,12 +16,12 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
 jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  secret: ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   expiration: 604800000
 
 gemini:
   api:
-    key: ${GEMINI_API_KEY:${VITE_GEMINI_API_KEY:mock_key_for_dev}}
+    key: ${GEMINI_API_KEY:mock_key_for_dev}
 
 logging:
   level:
@@ -35,3 +36,5 @@ management:
   endpoint:
     health:
       show-details: always
+
+      
