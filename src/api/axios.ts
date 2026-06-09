@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 // Base Axios instance configuration
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8082/api' : 'https://student-intelligence-system.onrender.com/api'),
+  baseURL: window.location.hostname !== 'localhost' ? 'https://student-intelligence-system.onrender.com/api' : (import.meta.env.VITE_API_URL || 'http://localhost:8082/api'),
   headers: {
     'Content-Type': 'application/json',
   },
