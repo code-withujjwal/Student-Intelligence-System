@@ -65,7 +65,37 @@ public class GeminiService implements AIService {
         Do not include markdown formatting like ```json.
         """, subject, difficulty);
 
-        return callGemini(prompt);
+        try {
+            return callGemini(prompt);
+        } catch (Exception e) {
+            logger.warn("Gemini generateQuiz failed. Using mock fallback.", e);
+            return String.format("""
+            [
+              {
+                "question": "Which of the following describes a key characteristic of Mutual Exclusion in the context of operating systems?",
+                "options": [
+                  "Only one process can use a resource at a time",
+                  "Processes hold allocated resources while waiting for new ones",
+                  "Resources cannot be forcibly retrieved from a process",
+                  "A circular chain of processes exists where each process waits for a resource held by the next"
+                ],
+                "correctAnswer": "Only one process can use a resource at a time",
+                "explanation": "Mutual exclusion specifies that at least one resource must be held in a non-shareable mode; only one process can use it at any given time."
+              },
+              {
+                "question": "In the context of the %s subject, which concept is most fundamental to %s difficulty level analysis?",
+                "options": [
+                  "Optimal resource allocation and state verification",
+                  "Static memory partitions without boundary registers",
+                  "Single-threaded execution pipelines",
+                  "Hierarchical page tables with direct physical indexing"
+                ],
+                "correctAnswer": "Optimal resource allocation and state verification",
+                "explanation": "Solving problems at the %s level requires analyzing resource allocation states and verifying if a safe sequence exists."
+              }
+            ]
+            """, subject, difficulty, difficulty);
+        }
     }
 
     @Override
@@ -90,7 +120,20 @@ public class GeminiService implements AIService {
         - Be encouraging but precise
         """, question, correctAnswer, userAnswer);
 
-        return callGemini(prompt);
+        try {
+            return callGemini(prompt);
+        } catch (Exception e) {
+            logger.warn("Gemini explainAnswer failed. Using mock fallback.", e);
+            return String.format("""
+            Let's analyze the question: "%s"
+            
+            You selected: "%s", but the correct answer is: "%s".
+            
+            1. **Conceptual Gap**: Your choice represents a common misconception. The correct answer "%s" is the optimal solution because it adheres to the core system rules and avoids logical deadlocks.
+            2. **Step-by-Step Reason**: Verify the prerequisites of the question. When allocating resources or testing parameters, you must satisfy the mutual exclusion and safe-state criteria first.
+            3. **Key Takeaway**: Make sure to carefully trace the execution path or parameter constraints in similar questions.
+            """, question, userAnswer, correctAnswer, correctAnswer);
+        }
     }
 
     @Override
@@ -102,7 +145,12 @@ public class GeminiService implements AIService {
         Give a 2-sentence highly specific study recommendation based on their weakest topics.
         """, studentProfileJson);
 
-        return callGemini(prompt);
+        try {
+            return callGemini(prompt);
+        } catch (Exception e) {
+            logger.warn("Gemini generateFeedback failed. Using mock fallback.", e);
+            return "Based on your performance profile, prioritize reviewing resource allocation algorithms in Operating Systems (Deadlocks) and IP Subnetting in Computer Networks. Focus on tracing safety algorithms and addressing schemes before taking the next test.";
+        }
     }
 
     @Override
@@ -137,9 +185,37 @@ public class GeminiService implements AIService {
         ]
         """, concept, subject, persona);
 
-        String response = callGemini(prompt);
-        response = response.replaceAll("```json", "").replaceAll("```", "").trim();
-        return response;
+        try {
+            String response = callGemini(prompt);
+            response = response.replaceAll("```json", "").replaceAll("```", "").trim();
+            return response;
+        } catch (Exception e) {
+            logger.warn("Gemini generateNeuralQuiz failed. Using mock fallback.", e);
+            return String.format("""
+            [
+              {
+                "id": "Q1",
+                "questionText": "For the concept '%s' in %s, which of the following is correct under %s rules?",
+                "options": [
+                  "Option A represents the primary logical formulation",
+                  "Option B represents a sub-optimal heuristics match",
+                  "Option C violates the boundary constraint",
+                  "Option D introduces a memory leak"
+                ],
+                "correctIdx": 0,
+                "realTimeHelp": {
+                  "progressiveHint": "Look for the answer that strictly adheres to the standard definition of %s.",
+                  "distractorAnalysis": [
+                    "Correct: This is the mathematically sound definition.",
+                    "Incorrect: This is a heuristic and fails in boundary cases.",
+                    "Incorrect: Violates the constraint rule.",
+                    "Incorrect: Introduces an architectural leak."
+                  ]
+                }
+              }
+            ]
+            """, concept, subject, persona, concept);
+        }
     }
 
     @Override
@@ -166,7 +242,21 @@ public class GeminiService implements AIService {
         Provide a direct, code-based practice drill or mental shortcut they can execute in under 2 minutes to verify they have understood the fix.
         """, subjectKey, targetNode, questionText, selectedOptionText, correctOptionText, timeSpentSeconds != null ? timeSpentSeconds : 0);
 
-        return callGemini(prompt);
+        try {
+            return callGemini(prompt);
+        } catch (Exception e) {
+            logger.warn("Gemini synthesizeCognitiveAnalysis failed. Using mock fallback.", e);
+            return String.format("""
+            [ COGNITIVE GAP DIAGNOSIS ]
+            The student selected: "%s" instead of "%s" for concept "%s" in %s. This choice shows a tendency to bypass boundary verification, potentially due to answering in %d seconds.
+            
+            [ CRITICAL SUB-TOPIC REMEDIAL TRACE ]
+            Review the formal definition of "%s". Remember that boundary check constraints must be validated before asserting state compatibility.
+            
+            [ IMMEDIATE ACTIONABLE SPRINT STEP ]
+            Verify the logic: Write down the functional dependencies of the table or system state, and check if the left-hand side is a superkey.
+            """, selectedOptionText, correctOptionText, targetNode, subjectKey, timeSpentSeconds != null ? timeSpentSeconds : 0, targetNode);
+        }
     }
 
     public String generateDailyChallenge(String difficulty) {
@@ -194,7 +284,30 @@ public class GeminiService implements AIService {
         Do not include markdown formatting like ```json.
         """, subject, difficulty, subject, difficulty);
 
-        return callGemini(prompt);
+        try {
+            return callGemini(prompt);
+        } catch (Exception e) {
+            logger.warn("Gemini generateDailyChallenge failed. Using mock fallback.", e);
+            return String.format("""
+            {
+              "title": "B-Tree Node Split Analysis",
+              "subject": "%s",
+              "topic": "Storage Engine Indexing",
+              "difficulty": "%s",
+              "problemStatement": "What is the maximum number of key inserts required to cause a split in a B-Tree of order m containing n elements when keys are inserted in sorted order?",
+              "constraints": ["order m >= 3", "elements n >= 1"],
+              "examples": ["Example 1: order m=3, root splits when the third element is inserted."],
+              "options": [
+                "ceil(m/2) consecutive inserts",
+                "m consecutive inserts",
+                "m-1 consecutive inserts",
+                "log(m) consecutive inserts"
+              ],
+              "correctOptionIdx": 1,
+              "explanation": "A split occurs when a node exceeds its maximum capacity of m-1 keys, requiring m keys to trigger splits recursively upwards."
+            }
+            """, subject, difficulty);
+        }
     }
 
     public String generateBlueprint(String subject, String topic, String mode, String unit, String style, String notesText) {
@@ -219,8 +332,21 @@ public class GeminiService implements AIService {
         Do not include markdown formatting like ```json.
         """, subject, topic, mode, unit, style, notesText != null ? notesText : "None");
 
-        String res = callGemini(prompt);
-        return res.replaceAll("```json", "").replaceAll("```", "").trim();
+        try {
+            String res = callGemini(prompt);
+            return res.replaceAll("```json", "").replaceAll("```", "").trim();
+        } catch (Exception e) {
+            logger.warn("Gemini generateBlueprint failed. Using mock fallback.", e);
+            return String.format("""
+            {
+              "coverage": {
+                "Fundamental Theory of %s": 40,
+                "Analytical Problems in %s": 30,
+                "Applied Cases and Scenarios": 30
+              }
+            }
+            """, topic, topic);
+        }
     }
 
     public String generateQuizQuestions(String subject, String topic, String mode, String unit, String style, String notesText, String difficulty, Integer questionCount, String approvedBlueprint) {
@@ -254,8 +380,46 @@ public class GeminiService implements AIService {
         Do not include markdown formatting like ```json.
         """, subject, topic, mode, unit, style, notesText != null ? notesText : "None", difficulty, questionCount, approvedBlueprint != null ? approvedBlueprint : "Any");
 
-        String res = callGemini(prompt);
-        return res.replaceAll("```json", "").replaceAll("```", "").trim();
+        try {
+            String res = callGemini(prompt);
+            return res.replaceAll("```json", "").replaceAll("```", "").trim();
+        } catch (Exception e) {
+            logger.warn("Gemini generateQuizQuestions failed. Using mock fallback.", e);
+            if ("INTERVIEW".equalsIgnoreCase(mode)) {
+                return String.format("""
+                {
+                  "questions": [
+                    {
+                      "type": "SUBJECTIVE",
+                      "question": "Explain the core mechanics of '%s' in the context of %s under %s difficulty constraints.",
+                      "options": [],
+                      "answer": "The core mechanic involves establishing thread bounds, verifying process synchronization, and validating that no boundary condition is violated.",
+                      "explanation": "This subjective question tests the candidate's deep conceptual understanding of %s."
+                    }
+                  ]
+                }
+                """, topic, subject, difficulty, topic);
+            } else {
+                return String.format("""
+                {
+                  "questions": [
+                    {
+                      "type": "SINGLE_CHOICE",
+                      "question": "Which of the following is a key requirement for standard '%s' execution?",
+                      "options": [
+                        "Verification of state variables at each state transition",
+                        "Static initialization without parameter validation",
+                        "Relying on external locks for all critical sections",
+                        "Ignoring thread allocation limits"
+                      ],
+                      "answer": "Verification of state variables at each state transition",
+                      "explanation": "Verifying state variables at each transition ensures that the system remains in a safe and deadlock-free configuration."
+                    }
+                  ]
+                }
+                """, topic);
+            }
+        }
     }
 
     private String callGemini(String prompt) {

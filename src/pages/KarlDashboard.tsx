@@ -140,12 +140,14 @@ const KarlDashboard: React.FC = () => {
             >
               <Map className="w-3.5 h-3.5" /> Syllabus Map
             </button>
-            <button
-              onClick={() => navigate('/teach')}
-              className="karl-btn-ghost flex items-center gap-2"
-            >
-              <Brain className="w-3.5 h-3.5" /> Teacher Mode
-            </button>
+            {user && (user.role === 'TEACHER' || user.role === 'ADMIN') && (
+              <button
+                onClick={() => navigate('/teach')}
+                className="karl-btn-ghost flex items-center gap-2"
+              >
+                <Brain className="w-3.5 h-3.5" /> Teacher Mode
+              </button>
+            )}
             <button
               onClick={() => navigate('/my-progress')}
               className="karl-btn-ghost flex items-center gap-2"

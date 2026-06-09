@@ -27,9 +27,11 @@ import {
   CheckSquare,
   Calendar,
   Archive,
-  HelpCircle
+  HelpCircle,
+  Lock
 } from 'lucide-react';
 import { useFeaturesStore } from '../store/useFeaturesStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { toast } from 'sonner';
 
 const SECTORS = [
@@ -138,8 +140,21 @@ const getBadgeColor = (color: string) => {
 export default function FeaturesHub() {
   const navigate = useNavigate();
   const store = useFeaturesStore();
+  const { user } = useAuthStore();
+
+  const isRestrictedForStudent = (itemId: number) => {
+    const restrictedIds = [19, 20, 21, 22];
+    return user?.role === 'STUDENT' && restrictedIds.includes(itemId);
+  };
 
   const handleCardClick = (id: number) => {
+    if (isRestrictedForStudent(id)) {
+      toast.error('Access Denied', {
+        description: 'Teacher clearance required for this operation.',
+        id: 'teacher-auth-required-toast'
+      });
+      return;
+    }
     switch (id) {
       case 1:
         navigate('/start'); // Changed from /start-quiz to /start as per App.tsx
@@ -288,17 +303,21 @@ export default function FeaturesHub() {
                     <motion.div
                       key={item.id}
                       variants={itemVariants}
-                      whileHover={{ scale: 1.015 }}
+                      whileHover={isRestrictedForStudent(item.id) ? {} : { scale: 1.015 }}
                       onClick={() => handleCardClick(item.id)}
-                      className={`group relative bg-[#0e1322]/30 backdrop-blur-md border border-white/5 rounded-xl p-6 cursor-pointer overflow-hidden transition-all duration-300 ease-out ${getGlowStyles(sector.glowColor)}`}
+                      className={`group relative bg-[#0e1322]/30 backdrop-blur-md border border-white/5 rounded-xl p-6 cursor-pointer overflow-hidden transition-all duration-300 ease-out ${isRestrictedForStudent(item.id) ? 'opacity-40 hover:border-red-500/20 cursor-not-allowed' : getGlowStyles(sector.glowColor)}`}
                     >
                       <div className="relative z-10 flex flex-col h-full pb-6 text-left">
                         <div className="flex justify-between items-start mb-4">
                           <div className="w-10 h-10 border border-white/10 rounded-lg flex items-center justify-center bg-slate-950/40">
-                            <Icon className="w-5 h-5 text-slate-300 group-hover:text-white transition-colors" />
+                            {isRestrictedForStudent(item.id) ? (
+                              <Lock className="w-5 h-5 text-red-500/60" />
+                            ) : (
+                              <Icon className="w-5 h-5 text-slate-300 group-hover:text-white transition-colors" />
+                            )}
                           </div>
-                          <span className={`absolute top-5 right-5 font-mono text-[10px] px-2 py-0.5 border bg-black/40 font-bold rounded uppercase tracking-wider ${getBadgeColor(sector.glowColor)}`}>
-                            {item.status}
+                          <span className={`absolute top-5 right-5 font-mono text-[10px] px-2 py-0.5 border bg-black/40 font-bold rounded uppercase tracking-wider ${isRestrictedForStudent(item.id) ? 'text-red-400 border-red-500/20' : getBadgeColor(sector.glowColor)}`}>
+                            {isRestrictedForStudent(item.id) ? 'LOCKED' : item.status}
                           </span>
                         </div>
 
