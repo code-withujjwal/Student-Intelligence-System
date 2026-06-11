@@ -5,24 +5,47 @@ import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, CheckCircle2, Zap } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CELESTIAL DATA MATRIX — 7 Core Nodes
 // ─────────────────────────────────────────────────────────────────────────────
 const CELESTIAL_NODES = [
-  { id: 'P1', orbitRadius: 160, tilt: 15,  speed: 0.18, type: 'METRIC',  label: 'ACCURACY TREND',     dataVisual: 'TREND_SPHERE', color: '#a78bfa' },
-  { id: 'P2', orbitRadius: 220, tilt: -12, speed: 0.25, type: 'MISSION', label: 'DAILY MISSION',       dataVisual: 'TASK_RING',    color: '#22d3ee' },
-  { id: 'P3', orbitRadius: 280, tilt: 8,   speed: 0.32, type: 'METRIC',  label: 'GLOBAL RANK',         dataVisual: 'RANK_ORB',     color: '#fbbf24' },
-  { id: 'P4', orbitRadius: 340, tilt: -18, speed: 0.40, type: 'GAP',     label: 'NEURAL GAP ANALYSIS', dataVisual: 'GLITCH_CORE',  color: '#f87171' },
-  { id: 'P5', orbitRadius: 400, tilt: 10,  speed: 0.50, type: 'SUBJECT', label: 'DATA STRUCTURES',     dataVisual: 'DSA_NODE',     color: '#34d399' },
-  { id: 'P6', orbitRadius: 460, tilt: -6,  speed: 0.62, type: 'SUBJECT', label: 'DATABASE SYSTEMS',    dataVisual: 'DBMS_SCHEMA',  color: '#60a5fa' },
-  { id: 'P7', orbitRadius: 520, tilt: 14,  speed: 0.75, type: 'SUBJECT', label: 'OPERATING SYSTEMS',   dataVisual: 'OS_THREAD',    color: '#fb923c' },
+  { id: 'P1', orbitRadius: 160, tilt: 15,  speed: 0.18, type: 'METRIC',  label: 'ACCURACY TREND',     dataVisual: 'TREND_SPHERE', colorDark: '#a78bfa', colorLight: '#8b5cf6' },
+  { id: 'P2', orbitRadius: 220, tilt: -12, speed: 0.25, type: 'MISSION', label: 'DAILY MISSION',       dataVisual: 'TASK_RING',    colorDark: '#22d3ee', colorLight: '#0ea5e9' },
+  { id: 'P3', orbitRadius: 280, tilt: 8,   speed: 0.32, type: 'METRIC',  label: 'GLOBAL RANK',         dataVisual: 'RANK_ORB',     colorDark: '#fbbf24', colorLight: '#d97706' },
+  { id: 'P4', orbitRadius: 340, tilt: -18, speed: 0.40, type: 'GAP',     label: 'NEURAL GAP ANALYSIS', dataVisual: 'GLITCH_CORE',  colorDark: '#f87171', colorLight: '#ef4444' },
+  { id: 'P5', orbitRadius: 400, tilt: 10,  speed: 0.50, type: 'SUBJECT', label: 'DATA STRUCTURES',     dataVisual: 'DSA_NODE',     colorDark: '#34d399', colorLight: '#10b981' },
+  { id: 'P6', orbitRadius: 460, tilt: -6,  speed: 0.62, type: 'SUBJECT', label: 'DATABASE SYSTEMS',    dataVisual: 'DBMS_SCHEMA',  colorDark: '#60a5fa', colorLight: '#3b82f6' },
+  { id: 'P7', orbitRadius: 520, tilt: 14,  speed: 0.75, type: 'SUBJECT', label: 'OPERATING SYSTEMS',   dataVisual: 'OS_THREAD',    colorDark: '#fb923c', colorLight: '#f97316' },
 ] as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DEEP SPACE STARFIELD
 // ─────────────────────────────────────────────────────────────────────────────
-function DeepSpaceStars() {
+
+function EnvironmentController({ isDark }: { isDark: boolean }) {
+  const { scene } = useThree();
+  const targetBg = useMemo(() => new THREE.Color(isDark ? '#060912' : '#f0f9ff'), [isDark]);
+  const targetFog = useMemo(() => new THREE.Color(isDark ? '#060912' : '#e0f2fe'), [isDark]);
+
+  useEffect(() => {
+    if (!scene.background) scene.background = new THREE.Color('#060912');
+    if (!scene.fog) scene.fog = new THREE.Fog('#060912', 1200, 2600);
+  }, [scene]);
+
+  useFrame((_, delta) => {
+    if (scene.background instanceof THREE.Color) {
+      scene.background.lerp(targetBg, delta * 3);
+    }
+    if (scene.fog instanceof THREE.Fog) {
+      scene.fog.color.lerp(targetFog, delta * 3);
+    }
+  });
+  return null;
+}
+
+function DeepSpaceStars({ isDark }: { isDark: boolean }) {
   const pointsRef = useRef<THREE.Points>(null!);
 
   const { positions, colors } = useMemo(() => {
@@ -55,6 +78,8 @@ function DeepSpaceStars() {
     if (pointsRef.current) {
       pointsRef.current.rotation.y += delta * 0.004;
       pointsRef.current.rotation.x += delta * 0.001;
+      const mat = pointsRef.current.material as THREE.PointsMaterial;
+      mat.opacity = THREE.MathUtils.lerp(mat.opacity, isDark ? 0.85 : 0.05, delta * 2);
     }
   });
 
@@ -78,13 +103,21 @@ function DeepSpaceStars() {
 // ─────────────────────────────────────────────────────────────────────────────
 // KARL SUN — multi-layer emissive sphere with corona rings
 // ─────────────────────────────────────────────────────────────────────────────
-function KarlSun() {
+function KarlSun({ isDark }: { isDark: boolean }) {
   const coreRef = useRef<THREE.Mesh>(null!);
   const auraRef = useRef<THREE.Mesh>(null!);
   const coronaRef = useRef<THREE.Mesh>(null!);
   const ring1Ref = useRef<THREE.Mesh>(null!);
   const ring2Ref = useRef<THREE.Mesh>(null!);
   const pulseRef = useRef(0);
+
+  const targetCoreColor = useMemo(() => new THREE.Color(isDark ? '#1a0a3e' : '#fef08a'), [isDark]);
+  const targetCoreEmissive = useMemo(() => new THREE.Color(isDark ? '#7c3aed' : '#f59e0b'), [isDark]);
+  const targetAuraColor = useMemo(() => new THREE.Color(isDark ? '#4c1d95' : '#fcd34d'), [isDark]);
+  const targetAuraEmissive = useMemo(() => new THREE.Color(isDark ? '#8b5cf6' : '#fbbf24'), [isDark]);
+  const targetCoronaColor = useMemo(() => new THREE.Color(isDark ? '#1e40af' : '#7dd3fc'), [isDark]);
+  const targetCoronaEmissive = useMemo(() => new THREE.Color(isDark ? '#22d3ee' : '#38bdf8'), [isDark]);
+
 
   const coreGeo = useMemo(() => new THREE.SphereGeometry(60, 64, 64), []);
   const auraGeo = useMemo(() => new THREE.SphereGeometry(72, 32, 32), []);
@@ -99,24 +132,34 @@ function KarlSun() {
       coreRef.current.rotation.z += delta * 0.02;
       const mat = coreRef.current.material as THREE.MeshStandardMaterial;
       mat.emissiveIntensity = 1.2 + Math.sin(pulseRef.current * 1.4) * 0.3;
+      mat.color.lerp(targetCoreColor, delta * 3);
+      mat.emissive.lerp(targetCoreEmissive, delta * 3);
     }
     if (auraRef.current) {
       auraRef.current.rotation.y -= delta * 0.03;
       const mat = auraRef.current.material as THREE.MeshStandardMaterial;
-      mat.opacity = 0.12 + Math.sin(pulseRef.current * 0.8) * 0.04;
+      mat.opacity = (isDark ? 0.12 : 0.2) + Math.sin(pulseRef.current * 0.8) * 0.04;
+      mat.color.lerp(targetAuraColor, delta * 3);
+      mat.emissive.lerp(targetAuraEmissive, delta * 3);
     }
     if (coronaRef.current) {
       coronaRef.current.rotation.x += delta * 0.015;
       const mat = coronaRef.current.material as THREE.MeshStandardMaterial;
-      mat.opacity = 0.05 + Math.sin(pulseRef.current * 0.5) * 0.02;
+      mat.opacity = (isDark ? 0.05 : 0.15) + Math.sin(pulseRef.current * 0.5) * 0.02;
+      mat.color.lerp(targetCoronaColor, delta * 3);
+      mat.emissive.lerp(targetCoronaEmissive, delta * 3);
     }
     if (ring1Ref.current) {
       ring1Ref.current.rotation.x = Math.PI / 2 + Math.sin(pulseRef.current * 0.3) * 0.1;
       ring1Ref.current.rotation.z += delta * 0.04;
+      const mat = ring1Ref.current.material as THREE.MeshBasicMaterial;
+      mat.color.lerp(targetAuraEmissive, delta * 3);
     }
     if (ring2Ref.current) {
       ring2Ref.current.rotation.x = Math.PI / 3;
       ring2Ref.current.rotation.y += delta * 0.05;
+      const mat = ring2Ref.current.material as THREE.MeshBasicMaterial;
+      mat.color.lerp(targetCoronaEmissive, delta * 3);
     }
   });
 
@@ -174,9 +217,9 @@ function KarlSun() {
           fontSize: '9px',
           fontWeight: 900,
           letterSpacing: '0.22em',
-          color: 'rgba(196,181,253,0.75)',
+          color: isDark ? 'rgba(196,181,253,0.75)' : 'rgba(100,116,139,0.9)',
           textTransform: 'uppercase',
-          textShadow: '0 0 12px rgba(139,92,246,0.9)',
+          textShadow: isDark ? '0 0 12px rgba(139,92,246,0.9)' : '0 0 12px rgba(251,191,36,0.8)',
           whiteSpace: 'nowrap',
           userSelect: 'none',
         }}>
@@ -194,7 +237,7 @@ function KarlSun() {
 // ─────────────────────────────────────────────────────────────────────────────
 // ORBITAL RING — tilted glowing torus
 // ─────────────────────────────────────────────────────────────────────────────
-function OrbitalRing({ radius, tilt, color }: { radius: number; tilt: number; color: string }) {
+function OrbitalRing({ radius, tilt, colorDark, colorLight, isDark }: { radius: number; tilt: number; colorDark: string; colorLight: string; isDark: boolean }) {
   const meshRef = useRef<THREE.Mesh>(null!);
   const geo = useMemo(() => new THREE.TorusGeometry(radius, 0.55, 8, 240), [radius]);
 
@@ -210,7 +253,7 @@ function OrbitalRing({ radius, tilt, color }: { radius: number; tilt: number; co
       geometry={geo}
       rotation={[Math.PI / 2 + THREE.MathUtils.degToRad(tilt), 0, 0]}
     >
-      <meshBasicMaterial color={color} transparent opacity={0.22} />
+      <meshBasicMaterial color={isDark ? colorDark : colorLight} transparent opacity={0.22} />
     </mesh>
   );
 }
@@ -222,7 +265,9 @@ function PlanetNode({
   orbitRadius,
   tilt,
   speed,
-  color,
+  colorDark,
+  colorLight,
+  isDark,
   dataVisual,
   label,
   initialAngle,
@@ -230,7 +275,9 @@ function PlanetNode({
   orbitRadius: number;
   tilt: number;
   speed: number;
-  color: string;
+  colorDark: string;
+  colorLight: string;
+  isDark: boolean;
   dataVisual: string;
   label: string;
   initialAngle: number;
@@ -282,7 +329,7 @@ function PlanetNode({
       {/* Glow sphere behind planet */}
       <mesh>
         <sphereGeometry args={[18, 12, 12]} />
-        <meshBasicMaterial color={color} transparent opacity={0.07} depthWrite={false} />
+        <meshBasicMaterial color={isDark ? colorDark : colorLight} transparent opacity={0.07} depthWrite={false} />
       </mesh>
 
       {/* Main planet mesh */}
@@ -294,8 +341,8 @@ function PlanetNode({
         castShadow
       >
         <meshStandardMaterial
-          color={color}
-          emissive={color}
+          color={isDark ? colorDark : colorLight}
+          emissive={isDark ? colorDark : colorLight}
           emissiveIntensity={hovered ? 1.0 : 0.55}
           roughness={dataVisual === 'OS_THREAD' ? 1.0 : 0.35}
           metalness={0.3}
@@ -309,17 +356,17 @@ function PlanetNode({
           <div style={{
             background: 'rgba(14,19,34,0.85)',
             backdropFilter: 'blur(8px)',
-            border: `1px solid ${color}44`,
+            border: `1px solid ${isDark ? colorDark : colorLight}44`,
             borderRadius: '6px',
             padding: '4px 10px',
             fontFamily: 'JetBrains Mono, monospace',
             fontSize: '8px',
             fontWeight: 700,
             letterSpacing: '0.15em',
-            color: color,
+            color: isDark ? colorDark : colorLight,
             whiteSpace: 'nowrap',
             textTransform: 'uppercase',
-            boxShadow: `0 0 12px ${color}33`,
+            boxShadow: `0 0 12px ${isDark ? colorDark : colorLight}33`,
           }}>
             {label}
           </div>
@@ -332,7 +379,7 @@ function PlanetNode({
 // ─────────────────────────────────────────────────────────────────────────────
 // ASTEROID BELT — InstancedMesh × 10,000
 // ─────────────────────────────────────────────────────────────────────────────
-function AsteroidBelt() {
+function AsteroidBelt({ isDark }: { isDark: boolean }) {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   const ASTEROID_COUNT = 10000;
 
@@ -438,11 +485,11 @@ function AsteroidBelt() {
   return (
     <instancedMesh ref={meshRef} args={[geo, undefined, ASTEROID_COUNT]} castShadow>
       <meshStandardMaterial
-        color="#8899bb"
-        roughness={0.88}
-        metalness={0.12}
-        emissive="#1a2040"
-        emissiveIntensity={0.15}
+        color={isDark ? "#8899bb" : "#38bdf8"}
+        roughness={isDark ? 0.88 : 0.2}
+        metalness={isDark ? 0.12 : 0.8}
+        emissive={isDark ? "#1a2040" : "#0284c7"}
+        emissiveIntensity={isDark ? 0.15 : 0.4}
       />
     </instancedMesh>
   );
@@ -451,18 +498,19 @@ function AsteroidBelt() {
 // ─────────────────────────────────────────────────────────────────────────────
 // CELESTIAL SCENE — assembles all 3D objects
 // ─────────────────────────────────────────────────────────────────────────────
-function CelestialScene() {
+function CelestialScene({ isDark }: { isDark: boolean }) {
   return (
     <>
+      <EnvironmentController isDark={isDark} />
       {/* Lighting */}
-      <ambientLight intensity={0.12} color="#0d0d30" />
-      <directionalLight color="#ffffff" intensity={0.25} position={[200, 400, 200]} />
+      <ambientLight intensity={isDark ? 0.12 : 0.6} color={isDark ? "#0d0d30" : "#ffffff"} />
+      <directionalLight color="#ffffff" intensity={isDark ? 0.25 : 1.2} position={[200, 400, 200]} />
 
       {/* Background starfield */}
-      <DeepSpaceStars />
+      <DeepSpaceStars isDark={isDark} />
 
       {/* Central Sun */}
-      <KarlSun />
+      <KarlSun isDark={isDark} />
 
       {/* 7 Orbital Rings */}
       {CELESTIAL_NODES.map((node) => (
@@ -470,7 +518,9 @@ function CelestialScene() {
           key={`ring-${node.id}`}
           radius={node.orbitRadius}
           tilt={node.tilt}
-          color={node.color}
+          colorDark={node.colorDark}
+          colorLight={node.colorLight}
+          isDark={isDark}
         />
       ))}
 
@@ -481,7 +531,9 @@ function CelestialScene() {
           orbitRadius={node.orbitRadius}
           tilt={node.tilt}
           speed={node.speed}
-          color={node.color}
+          colorDark={node.colorDark}
+          colorLight={node.colorLight}
+          isDark={isDark}
           dataVisual={node.dataVisual}
           label={node.label}
           initialAngle={(idx / CELESTIAL_NODES.length) * Math.PI * 2}
@@ -489,7 +541,7 @@ function CelestialScene() {
       ))}
 
       {/* Asteroid Belt */}
-      <AsteroidBelt />
+      <AsteroidBelt isDark={isDark} />
 
       {/* Camera Controls */}
       <OrbitControls
@@ -520,9 +572,11 @@ const STUDENT_BENEFITS = [
 function AuthPanel({
   visible,
   onLogin,
+  isDark,
 }: {
   visible: boolean;
   onLogin: () => void;
+  isDark: boolean;
 }) {
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
@@ -563,12 +617,12 @@ function AuthPanel({
               gap: '2.5rem',
               maxWidth: '860px',
               width: '100%',
-              background: 'rgba(6,9,18,0.72)',
+              background: isDark ? 'rgba(6,9,18,0.72)' : 'rgba(255,255,255,0.85)',
               backdropFilter: 'blur(22px)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.05)',
               borderRadius: '20px',
               padding: '2.5rem',
-              boxShadow: '0 0 80px rgba(99,102,241,0.08), 0 40px 100px rgba(0,0,0,0.6)',
+              boxShadow: isDark ? '0 0 80px rgba(99,102,241,0.08), 0 40px 100px rgba(0,0,0,0.6)' : '0 0 80px rgba(99,102,241,0.1), 0 40px 100px rgba(0,0,0,0.15)',
             }}
           >
             {/* Left column — orientation */}
@@ -587,7 +641,7 @@ function AuthPanel({
                   KARL.AI
                 </h2>
                 <p style={{
-                  color: '#64748b',
+                  color: isDark ? '#64748b' : '#475569',
                   fontSize: '0.72rem',
                   fontFamily: 'JetBrains Mono, monospace',
                   marginTop: '0.75rem',
@@ -618,7 +672,7 @@ function AuthPanel({
                       <CheckCircle2 size={10} color="#6366F1" />
                     </div>
                     <p style={{
-                      color: '#cbd5e1',
+                      color: isDark ? '#cbd5e1' : '#334155',
                       fontSize: '0.68rem',
                       lineHeight: 1.65,
                       fontFamily: 'Inter, sans-serif',
@@ -635,7 +689,7 @@ function AuthPanel({
                 borderRadius: '12px',
                 border: '1px solid rgba(255,255,255,0.05)',
                 padding: '0.9rem 1.1rem',
-                background: 'rgba(14,19,34,0.38)',
+                background: isDark ? 'rgba(14,19,34,0.38)' : 'rgba(241,245,249,0.8)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.9rem',
@@ -654,7 +708,7 @@ function AuthPanel({
 
             {/* Right column — auth form */}
             <div style={{
-              background: 'rgba(14,19,34,0.3)',
+              background: isDark ? 'rgba(14,19,34,0.3)' : 'rgba(255,255,255,0.5)',
               backdropFilter: 'blur(12px)',
               border: '1px solid rgba(255,255,255,0.05)',
               borderRadius: '16px',
@@ -709,7 +763,7 @@ function AuthPanel({
                   borderRadius: '12px',
                   border: '1px solid rgba(255,255,255,0.07)',
                   background: 'rgba(255,255,255,0.02)',
-                  color: '#cbd5e1',
+                  color: isDark ? '#cbd5e1' : '#334155',
                   fontFamily: 'JetBrains Mono, monospace',
                   fontSize: '0.6rem',
                   fontWeight: 800,
@@ -761,7 +815,7 @@ function AuthPanel({
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required={tab === 'register'}
-                        style={inputStyle}
+                        style={getInputStyle(isDark)}
                       />
                     </div>
                   )}
@@ -777,7 +831,7 @@ function AuthPanel({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      style={inputStyle}
+                      style={getInputStyle(isDark)}
                     />
                   </div>
 
@@ -793,7 +847,7 @@ function AuthPanel({
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        style={{ ...inputStyle, paddingRight: '2.5rem' }}
+                        style={{ ...getInputStyle(isDark), paddingRight: '2.5rem' }}
                       />
                       <button
                         type="button"
@@ -870,25 +924,26 @@ function AuthPanel({
 // ─────────────────────────────────────────────────────────────────────────────
 // SHARED STYLE
 // ─────────────────────────────────────────────────────────────────────────────
-const inputStyle: React.CSSProperties = {
+const getInputStyle = (isDark: boolean): React.CSSProperties => ({
   width: '100%',
   padding: '0.7rem 0.9rem',
   borderRadius: '10px',
-  border: '1px solid rgba(255,255,255,0.06)',
-  background: 'rgba(2,6,23,0.55)',
-  color: '#f1f5f9',
+  border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.05)',
+  background: isDark ? 'rgba(2,6,23,0.55)' : 'rgba(255,255,255,0.8)',
+  color: isDark ? '#f1f5f9' : '#0f172a',
   fontFamily: 'JetBrains Mono, monospace',
   fontSize: '0.72rem',
   outline: 'none',
   transition: 'border-color 0.15s ease',
   boxSizing: 'border-box',
-};
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN PAGE EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 export default function KarlSystem() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [authVisible, setAuthVisible] = useState(true);
   const [navVisible, setNavVisible] = useState(true);
 
@@ -902,7 +957,7 @@ export default function KarlSystem() {
       style={{
         width: '100vw',
         height: '100vh',
-        background: '#060912',
+        background: isDark ? '#060912' : '#f0f9ff',
         overflow: 'hidden',
         position: 'relative',
         fontFamily: 'Inter, sans-serif',
@@ -924,7 +979,7 @@ export default function KarlSystem() {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '0.9rem 1.75rem',
-              background: 'rgba(6,9,18,0.78)',
+              background: isDark ? 'rgba(6,9,18,0.78)' : 'rgba(255,255,255,0.85)',
               backdropFilter: 'blur(20px)',
               borderBottom: '1px solid rgba(255,255,255,0.05)',
             }}
@@ -935,8 +990,8 @@ export default function KarlSystem() {
                 onClick={() => navigate('/')}
                 style={{
                   width: '32px', height: '32px', borderRadius: '8px',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  background: 'transparent', color: '#64748b', cursor: 'pointer',
+                  border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.05)',
+                  background: 'transparent', color: isDark ? '#64748b' : '#475569', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 0.15s ease',
                 }}
@@ -1006,13 +1061,13 @@ export default function KarlSystem() {
         dpr={[1, 1.8]}
         shadows={false}
       >
-        <color attach="background" args={['#060912']} />
-        <fog attach="fog" args={['#060912', 1200, 2600]} />
-        <CelestialScene />
+        
+        
+        <CelestialScene isDark={isDark} />
       </Canvas>
 
       {/* ── Auth Panel Overlay ── */}
-      <AuthPanel visible={authVisible} onLogin={handleLogin} />
+      <AuthPanel visible={authVisible} onLogin={handleLogin} isDark={isDark} />
 
       {/* ── Dismiss hint ── */}
       <AnimatePresence>

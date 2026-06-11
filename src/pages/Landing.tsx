@@ -7,13 +7,13 @@ import { useUserStore } from '../store/useUserStore';
 import confetti from 'canvas-confetti';
 
 const ORBITAL_PLANETS_DATA = [
-  { id: 'P1', radiusX: 200, radiusY: 90,  speed: 0.012, label: 'ACCURACY TREND',     value: '89.4%',            subtitle: '89.4% SKILL STABILITY',  details: 'Dynamic vector graph tracking overall answer accuracy.',                       zIndex: 10 },
-  { id: 'P2', radiusX: 280, radiusY: 120, speed: 0.009, label: 'DAILY MISSION',       value: '5 CONCEPTS',       subtitle: 'ACTIVE RUNTIME TASK',     details: 'Master 5 concepts in DBMS Relational Normal Forms to bridge the gap.',       zIndex: 20 },
-  { id: 'P3', radiusX: 360, radiusY: 150, speed: 0.007, label: 'GLOBAL RANK',         value: '#3 TOP 1%',        subtitle: '#3 TOP 1% STANDING',      details: 'Real-time placement calculation across university metrics.',                  zIndex: 30 },
-  { id: 'P4', radiusX: 440, radiusY: 180, speed: 0.005, label: 'NEURAL GAP ANALYSIS', value: 'PHYSICS → MATH',   subtitle: 'DBMS → MASTER LEVEL',     details: 'Syllabus-aligned deficiency tracking system.',                               zIndex: 40 },
-  { id: 'P5', radiusX: 520, radiusY: 210, speed: 0.004, label: 'DATA STRUCTURES',     value: 'DSA REPOSITORY',   subtitle: 'CORE SYSTEM MODULE',      details: 'Syllabus tracking for algorithmic complexity and tree nodes.',               zIndex: 50 },
-  { id: 'P6', radiusX: 600, radiusY: 240, speed: 0.003, label: 'DATABASE SYSTEMS',    value: 'DBMS SCHEMAS',     subtitle: 'CORE SYSTEM MODULE',      details: 'Tracking schema normalizations and indexing structures.',                    zIndex: 60 },
-  { id: 'P7', radiusX: 680, radiusY: 270, speed: 0.002, label: 'OPERATING SYSTEMS',   value: 'CONCURRENCY CORE', subtitle: 'CORE SYSTEM MODULE',      details: 'Tracking thread scheduling and concurrency control records.',               zIndex: 70 },
+  { id: 'P1', radiusX: 200, radiusY: 90,  speed: 0.012, label: 'ACCURACY TREND',     value: '89.4%',            subtitle: 'Performance Stability',  details: 'Tracking your overall test accuracy over time.',                       zIndex: 10 },
+  { id: 'P2', radiusX: 280, radiusY: 120, speed: 0.009, label: 'DAILY MISSION',       value: '5 CONCEPTS',       subtitle: "Today's Objective",     details: 'Master 5 key concepts in Database Systems to stay on track.',       zIndex: 20 },
+  { id: 'P3', radiusX: 360, radiusY: 150, speed: 0.007, label: 'GLOBAL RANK',         value: '#3 TOP 1%',        subtitle: 'Global Standing',      details: 'Your real-time ranking among other students on the platform.',                  zIndex: 30 },
+  { id: 'P4', radiusX: 440, radiusY: 180, speed: 0.005, label: 'LEARNING GAPS',       value: 'PHYSICS → MATH',   subtitle: 'Skill Progression',     details: 'Identifying areas for improvement across your syllabus.',                               zIndex: 40 },
+  { id: 'P5', radiusX: 520, radiusY: 210, speed: 0.004, label: 'DATA STRUCTURES',     value: 'ALGORITHMS',       subtitle: 'Core Subject',      details: 'Monitoring progress in complexity analysis and graph theory.',               zIndex: 50 },
+  { id: 'P6', radiusX: 600, radiusY: 240, speed: 0.003, label: 'DATABASE SYSTEMS',    value: 'SQL & SCHEMAS',    subtitle: 'Core Subject',      details: 'Reviewing database normalization and query optimization.',                    zIndex: 60 },
+  { id: 'P7', radiusX: 680, radiusY: 270, speed: 0.002, label: 'OPERATING SYSTEMS',   value: 'CONCURRENCY',      subtitle: 'Core Subject',      details: 'Studying process scheduling and memory management.',               zIndex: 70 },
 ];
 
 function useOrbitalEngine() {
@@ -482,8 +482,8 @@ const Landing = () => {
               MASTER.
             </span>
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-[#94A3B8] max-w-2xl mx-auto font-medium">
-            The ultimate neural command center for engineering aspirants. Bridge your learning gaps with Gemini-powered precision.
+          <p className="text-base sm:text-lg md:text-xl text-[#94A3B8] max-w-2xl mx-auto font-medium leading-relaxed mt-2">
+            Your personalized learning dashboard. Master complex engineering topics and bridge your knowledge gaps with intelligent, data-driven insights.
           </p>
         </div>
 
@@ -509,7 +509,7 @@ const Landing = () => {
             className={clsx('bg-white/5 backdrop-blur-xl border rounded-xl p-4 flex flex-col gap-2 shadow-lg', gapAlert ? 'border-red-500/50 cursor-pointer' : 'border-white/10')}
           >
             <div className="flex justify-between items-center">
-              <span className={clsx('font-mono-data text-xs uppercase', gapAlert ? 'text-red-400' : 'text-gray-400')}>Neural Gap</span>
+              <span className={clsx('font-mono-data text-xs uppercase', gapAlert ? 'text-red-400' : 'text-gray-400')}>Learning Gap</span>
               <div className="flex items-center gap-2 text-sm font-medium">
                 <span className="text-indigo-400 font-mono-data text-xs">{lowestSubject}</span>
                 <ArrowRight size={12} className="text-gray-500" />

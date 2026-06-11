@@ -270,11 +270,8 @@ html.light,
 html.light body,
 html.light .surface-0 {
   background: 
-    radial-gradient(circle at 5% 5%, rgba(220, 252, 231, 0.45) 0%, transparent 35%),
-    radial-gradient(circle at 95% 5%, rgba(224, 242, 254, 0.5) 0%, transparent 35%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.85) 0%, transparent 60%),
-    radial-gradient(circle at 10% 90%, rgba(224, 242, 254, 0.3) 0%, transparent 40%),
-    radial-gradient(circle at 90% 90%, rgba(220, 252, 231, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at top left, rgba(224, 242, 254, 0.6) 0%, transparent 45%),
+    radial-gradient(circle at bottom right, rgba(220, 252, 231, 0.6) 0%, transparent 45%),
     #ffffff !important;
   background-attachment: fixed !important;
   color: #0f172a !important;
@@ -299,21 +296,21 @@ html.light ::-webkit-scrollbar-thumb:hover {
 }
 
 /* Make layout/wrapper containers transparent to let the gradient shine through */
-html.light div[style*="background: #060912"],
-html.light div[style*="background:#060912"],
-html.light div[style*="background: rgb(6, 9, 18)"],
-html.light div[style*="background: #000000"],
-html.light div[style*="background:#000000"],
-html.light div[style*="background: #0a0f1e"],
-html.light div[style*="background:#0a0f1e"],
-html.light div[style*="background: #0b0f19"],
-html.light div[style*="background:#0b0f19"],
-html.light div[style*="background: #0e1322"],
-html.light div[style*="background:#0e1322"],
+html.light div[style*="background: #0"],
+html.light div[style*="background:#0"],
+html.light div[style*="background: rgb(0"],
+html.light div[style*="background: rgb(4"],
+html.light div[style*="background: rgb(5"],
+html.light div[style*="background: rgb(6"],
+html.light div[style*="background: rgb(10"],
+html.light div[style*="background: rgba("],
+html.light .bg-\[\#040710\],
 html.light .bg-\[\#060912\],
 html.light .bg-\[\#0b0f19\],
 html.light .bg-\[\#f4f6fa\],
 html.light .bg-\[\#000000\],
+html.light .bg-\[\#050810\],
+html.light .bg-\[\#0A0B10\],
 html.light .bg-black,
 html.light .bg-slate-950\/80,
 html.light .bg-slate-950 {
@@ -340,28 +337,27 @@ html.light .surface-2,
 html.light .surface-3,
 html.light .karl-card,
 html.light .karl-card-inset {
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(226, 232, 240, 0.8) !important;
-  box-shadow: 0 4px 20px -2px rgba(148, 163, 184, 0.06), 
-              inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 4px 20px -2px rgba(148, 163, 184, 0.08) !important;
 }
 
 /* Custom Inset cards (slightly grey-ish for depth) */
 html.light .karl-card-inset,
 html.light .surface-2 {
-  background-color: rgba(248, 250, 252, 0.85) !important;
-  background: rgba(248, 250, 252, 0.85) !important;
+  background-color: rgba(248, 250, 252, 0.9) !important;
+  background: rgba(248, 250, 252, 0.9) !important;
 }
 
 /* Card Hover Interactions */
 html.light .karl-card:hover,
 html.light .bg-\[\#0e1322\]\/50:hover {
-  border-color: rgba(14, 165, 233, 0.35) !important; /* Soft light blue border on hover */
-  box-shadow: 0 12px 25px -4px rgba(14, 165, 233, 0.07), 
-              0 4px 10px -2px rgba(16, 185, 129, 0.05) !important; /* Combination of light blue & green glow */
+  border-color: rgba(56, 189, 248, 0.4) !important; /* light blue */
+  box-shadow: 0 12px 25px -4px rgba(56, 189, 248, 0.1), 
+              0 4px 10px -2px rgba(74, 222, 128, 0.08) !important; /* light green */
   transform: translateY(-1px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -369,8 +365,8 @@ html.light .bg-\[\#0e1322\]\/50:hover {
 /* Interactive custom hover override */
 html.light .hover\:bg-\[\#12192c\]\/40:hover,
 html.light .hover\:bg-\[\#12192c\]:hover {
-  background-color: rgba(224, 242, 254, 0.45) !important; /* Light blue accent background on hover */
-  border-color: rgba(186, 230, 253, 0.6) !important;
+  background-color: rgba(240, 249, 255, 0.8) !important; 
+  border-color: rgba(186, 230, 253, 0.8) !important;
 }
 
 /* Header sticky overlay */
@@ -380,49 +376,55 @@ html.light .sticky {
 }
 html.light header.bg-\[\#060912\]\/90,
 html.light header.bg-black\/90 {
-  background-color: rgba(255, 255, 255, 0.75) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.02) !important;
 }
 
-/* Override text color to dark slate for high legibility */
-html.light .text-white,
-html.light .text-slate-100,
-html.light .text-slate-200,
-html.light .text-slate-300,
+/* Override text color to dark slate for high legibility, carefully avoiding buttons/badges */
 html.light h1,
 html.light h2,
 html.light h3,
 html.light h4,
 html.light h5,
-html.light h6 {
+html.light h6,
+html.light .text-white:not(button):not(a):not([class*="bg-"]):not([class*="text-emerald"]):not([class*="text-indigo"]),
+html.light .text-slate-100:not(button):not(a):not([class*="bg-"]),
+html.light .text-slate-200:not(button):not(a):not([class*="bg-"]),
+html.light .text-slate-300:not(button):not(a):not([class*="bg-"]),
+html.light .text-gray-100:not(button):not(a):not([class*="bg-"]),
+html.light .text-gray-200:not(button):not(a):not([class*="bg-"]),
+html.light .text-gray-300:not(button):not(a):not([class*="bg-"]) {
   color: #0f172a !important;
 }
 
-html.light .text-slate-400,
-html.light .text-slate-500,
-html.light p {
+html.light p:not([class*="text-emerald"]):not([class*="text-indigo"]):not([class*="text-purple"]):not([class*="text-cyan"]),
+html.light .text-slate-400:not(button):not(a):not([class*="bg-"]),
+html.light .text-slate-500:not(button):not(a):not([class*="bg-"]),
+html.light .text-gray-400:not(button):not(a):not([class*="bg-"]),
+html.light .text-gray-500:not(button):not(a):not([class*="bg-"]) {
   color: #475569 !important;
 }
 
-/* Restore colors for colored texts (like badges/accent colors) */
-html.light .text-indigo-400,
-html.light .text-\[\#22d3ee\],
-html.light .text-cyan-400,
-html.light .text-emerald-400,
-html.light .text-green-400,
-html.light .text-amber-400,
-html.light .text-purple-400,
-html.light .text-red-400 {
-  color: inherit !important;
-}
+/* Fix specific colors that get overridden incorrectly */
+html.light .text-indigo-400 { color: #6366f1 !important; }
+html.light .text-emerald-400 { color: #34d399 !important; }
+html.light .text-cyan-400 { color: #06b6d4 !important; }
+html.light .text-purple-400 { color: #c084fc !important; }
+html.light .text-amber-400 { color: #fbbf24 !important; }
+html.light .text-red-400 { color: #f87171 !important; }
 
 /* Dynamic colors inside buttons/links should remain white for filled states */
 html.light button.text-white,
 html.light button.text-slate-100,
+html.light button .text-white,
+html.light button .text-slate-100,
 html.light a.text-white,
-html.light a.text-slate-100 {
+html.light a.text-slate-100,
+html.light a .text-white,
+html.light a .text-slate-100,
+html.light .bg-indigo-600 {
   color: #ffffff !important;
 }
 
