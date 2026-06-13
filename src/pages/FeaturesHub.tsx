@@ -191,7 +191,7 @@ export default function FeaturesHub() {
         navigate('/daily-challenge');
         break;
       case 11:
-        navigate('/multiplayer');
+        navigate('/battle');
         break;
       case 12:
         navigate('/leaderboard');

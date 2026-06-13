@@ -84,6 +84,8 @@ const App = () => {
                   <Route path="/quiz/:id/result" element={<ResultDetail />} />
                   <Route path="/multiplayer" element={<LiveQuizRoom />} />
                   <Route path="/multiplayer/:sessionId" element={<LiveQuizRoom />} />
+                  <Route path="/battle" element={<LiveQuizRoom />} />
+                  <Route path="/battle/:sessionId" element={<LiveQuizRoom />} />
                   <Route path="/friends" element={<Friends />} />
                   <Route path="/notifications" element={<Notifications />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
